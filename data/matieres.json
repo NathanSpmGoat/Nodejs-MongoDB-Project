@@ -1,0 +1,25 @@
+[
+    {
+        "name": "Mathématiques",
+        "coefficient": 3,
+        "description": "Mathématiques"
+    },
+
+    {
+        "name": "Java",
+        "coefficient": 3,
+        "description": "Java"
+    },
+
+    {
+        "name": "Python",
+        "coefficient": 4,
+        "description": "Python"
+    },
+
+    {
+        "name": "Node.js",
+        "coefficient": 5,
+        "description": "Node.js"
+    }
+]

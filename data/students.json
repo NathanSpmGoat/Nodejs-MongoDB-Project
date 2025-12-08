@@ -1,0 +1,26 @@
+[
+    {
+        "firstname": "John",
+        "lastname": "Doe",
+        "email": "john.doe@edu.ece.fr",
+        "grade": "B1"
+
+        },
+
+
+    {
+        "firstname": "Jane",
+        "lastname": "Doe",
+        "email": "jane.doe@edu.ece.fr",
+        "grade": "B2"
+        },
+
+
+    {
+        "firstname": "Jim",
+        "lastname": "Beam",
+        "email": "jim.beam@edu.ece.fr",
+        "grade": "Terminale"
+
+        }
+]
