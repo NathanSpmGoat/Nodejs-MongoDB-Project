@@ -1,0 +1,31 @@
+[
+    {
+      "firstname": "Albert",
+      "lastname": "Einstein",
+      "email": "albert.einstein@ece.fr",
+      "matieres": [
+        "6936529c98ef2e3a5e11ba02",
+        "6936529c98ef2e3a5e11ba04"
+      ]
+    },
+    {
+      "firstname": "Grace",
+      "lastname": "Hopper",
+      "email": "grace.hopper@ece.fr",
+      "matieres": [
+        "6936529c98ef2e3a5e11ba03",
+        "6936529c98ef2e3a5e11ba05"
+      ]
+    },
+    {
+      "firstname": "Ada",
+      "lastname": "Lovelace",
+      "email": "ada.lovelace@ece.fr",
+      "matieres": [
+        "6936529c98ef2e3a5e11ba02",
+        "6936529c98ef2e3a5e11ba03",
+        "6936529c98ef2e3a5e11ba04"
+      ]
+    }
+  ]
+  
