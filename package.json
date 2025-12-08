@@ -1,0 +1,23 @@
+{
+  "name": "data_mongo_node",
+  "version": "1.0.0",
+  "description": "Porjet final node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongodb": "^7.0.0",
+    "mongoose": "^9.0.1",
+    "validator": "^13.15.23"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
