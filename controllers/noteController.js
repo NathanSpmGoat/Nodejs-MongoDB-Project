@@ -11,19 +11,19 @@ import Note from "../models/noteModel.js";
 /**
  * Récupère l'ensemble des notes.
  */
-export const getNotes = async (req, res) => {
+export const getNotes = async (req, res, next) => {
   try {
     const notes = await Note.find();
     res.status(200).json(notes);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 /**
  * Récupère une note par son identifiant. Retourne 404 si elle n'existe pas.
  */
-export const getNoteById = async (req, res) => {
+export const getNoteById = async (req, res, next) => {
   try {
     const note = await Note.findById(req.params.id);
     if (!note) {
@@ -31,47 +31,47 @@ export const getNoteById = async (req, res) => {
     }
     res.status(200).json(note);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 /**
  * Crée une nouvelle note. Les champs sont extraits explicitement du corps de la requête.
  */
-export const createNote = async (req, res) => {
+export const createNote = async (req, res, next) => {
   try {
     const { student, matiere, value, type, date } = req.body;
     const note = await Note.create({ student, matiere, value, type, date });
     res.status(201).json(note);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 /**
  * Met à jour une note existante. Retourne 404 si la note n'existe pas.
  */
-export const updateNote = async (req, res) => {
+export const updateNote = async (req, res, next) => {
   try {
     const { student, matiere, value, type, date } = req.body;
     const note = await Note.findByIdAndUpdate(
       req.params.id,
       { student, matiere, value, type, date },
-      { new: true }
+      { new: true, runValidators: true }
     );
     if (!note) {
       return res.status(404).json({ message: "Note non trouvée" });
     }
     res.status(200).json(note);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 /**
  * Supprime une note. Retourne 404 si elle n'existe pas.
  */
-export const deleteNote = async (req, res) => {
+export const deleteNote = async (req, res, next) => {
   try {
     const note = await Note.findByIdAndDelete(req.params.id);
     if (!note) {
@@ -79,7 +79,7 @@ export const deleteNote = async (req, res) => {
     }
     res.status(200).json({ message: "Note supprimée avec succès" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
@@ -88,12 +88,11 @@ export const deleteNote = async (req, res) => {
  * coefficient de chaque matière afin de refléter l'importance relative des matières.
  * Si l'étudiant n'a pas de notes, la moyenne renvoyée est null.
  */
-export const getStudentAverage = async (req, res) => {
+export const getStudentAverage = async (req, res, next) => {
   try {
     const studentId = req.params.id;
 
-    // Récupération des notes de l'étudiant et des informations de la matière associée (coefficient).
-    const notes = await Note.find({ student: studentId }).populate('matiere', 'coefficient');
+    const notes = await Note.find({ student: studentId }).populate("matiere", "coefficient");
 
     if (notes.length === 0) {
       return res.status(200).json({
@@ -103,7 +102,6 @@ export const getStudentAverage = async (req, res) => {
       });
     }
 
-    // Somme des produits note*coefficient et somme des coefficients
     const { weightedSum, totalCoeff } = notes.reduce(
       (acc, note) => {
         const coeff = note.matiere?.coefficient || 1;
@@ -123,7 +121,6 @@ export const getStudentAverage = async (req, res) => {
       count: notes.length,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
-  

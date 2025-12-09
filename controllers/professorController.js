@@ -11,19 +11,19 @@ import Professor from "../models/professorModel.js";
 /**
  * Récupère tous les professeurs.
  */
-export const getProfessors = async (req, res) => {
+export const getProfessors = async (req, res, next) => {
   try {
     const list = await Professor.find();
     res.status(200).json(list);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 /**
  * Récupère un professeur par son ID. Retourne 404 s'il n'existe pas.
  */
-export const getProfessorById = async (req, res) => {
+export const getProfessorById = async (req, res, next) => {
   try {
     const prof = await Professor.findById(req.params.id);
     if (!prof) {
@@ -31,41 +31,45 @@ export const getProfessorById = async (req, res) => {
     }
     res.status(200).json(prof);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 /**
  * Crée un nouveau professeur. Les champs du corps de la requête sont utilisés tels quels.
  */
-export const createProfessor = async (req, res) => {
+export const createProfessor = async (req, res, next) => {
   try {
     const prof = await Professor.create(req.body);
     res.status(201).json(prof);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 /**
  * Met à jour un professeur. Retourne 404 si le professeur n'existe pas.
  */
-export const updateProfessor = async (req, res) => {
+export const updateProfessor = async (req, res, next) => {
   try {
-    const prof = await Professor.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const prof = await Professor.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
     if (!prof) {
       return res.status(404).json({ message: "Professeur non trouvé" });
     }
     res.status(200).json(prof);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 /**
  * Supprime un professeur. Retourne 404 si le professeur n'existe pas.
  */
-export const deleteProfessor = async (req, res) => {
+export const deleteProfessor = async (req, res, next) => {
   try {
     const prof = await Professor.findByIdAndDelete(req.params.id);
     if (!prof) {
@@ -73,6 +77,6 @@ export const deleteProfessor = async (req, res) => {
     }
     res.status(200).json({ message: "Professeur supprimé" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

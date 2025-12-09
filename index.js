@@ -5,6 +5,7 @@ import matiereRoutes from "./routes/matiereRoutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import professorRoutes from "./routes/professorRoutes.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 /*
  * Fichier d'entrée de l'application.
@@ -18,6 +19,10 @@ const app = express();
 
 // Middleware permettant de transformer le corps JSON des requêtes HTTP en objet JavaScript.
 app.use(express.json());
+
+// Gestion des Erreurs
+app.use(errorHandler);
+
 
 // Connexion à la base de données MongoDB. Cette fonction retourne une promesse.
 // On log en cas d'erreur pour éviter un plantage silencieux de l'application.
