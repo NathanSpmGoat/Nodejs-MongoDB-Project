@@ -5,7 +5,7 @@ import {
   createStudent,
   updateStudent,
   deleteStudent,
-  getStudentFull, // <-- ajout du lookup
+  getStudentFull,
 } from "../controllers/studentController.js";
 
 // Routeur pour les étudiants. Centralise les routes CRUD liées à la ressource "Student".
@@ -15,7 +15,7 @@ const router = express.Router();
 router.get("/", getStudents);
 
 // Récupérer un étudiant avec toutes ses notes + matières
-router.get("/:id/full", getStudentFull); // <-- nouvelle route
+router.get("/:id/full", getStudentFull);
 
 // Récupérer un étudiant par son ID
 router.get("/:id", getStudentById);
