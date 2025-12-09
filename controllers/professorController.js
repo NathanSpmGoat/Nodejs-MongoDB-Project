@@ -7,6 +7,7 @@
  */
 
 import Professor from "../models/professorModel.js";
+import Matiere from "../models/matiereModel.js";
 
 /**
  * Récupère tous les professeurs.
@@ -76,6 +77,33 @@ export const deleteProfessor = async (req, res, next) => {
       return res.status(404).json({ message: "Professeur non trouvé" });
     }
     res.status(200).json({ message: "Professeur supprimé" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Récupère toutes les matières enseignées par un professeur.
+ */
+export const getProfessorMatieres = async (req, res, next) => {
+  try {
+    const prof = await Professor.findById(req.params.id);
+    if (!prof) {
+      return res.status(404).json({ message: "Professeur non trouvé" });
+    }
+
+    const matieresIds = prof.matieres || [];
+    const matieres = await Matiere.find({ _id: { $in: matieresIds } });
+
+    res.status(200).json({
+      professor: {
+        id: prof._id,
+        firstname: prof.firstname,
+        lastname: prof.lastname,
+        email: prof.email,
+      },
+      matieres,
+    });
   } catch (error) {
     next(error);
   }
