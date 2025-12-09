@@ -32,7 +32,7 @@ app.use("/students", studentRoutes);
 app.use("/professors", professorRoutes);
 
 // Définition du port. On utilise une variable d'environnement si disponible
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // Lancement du serveur HTTP.
 app.listen(PORT, () => {
