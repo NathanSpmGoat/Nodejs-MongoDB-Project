@@ -6,6 +6,7 @@
  */
 
 import Student from "../models/studentModel.js";
+import mongoose from "mongoose";
 
 /**
  * Récupère la liste de tous les étudiants.
@@ -82,3 +83,72 @@ export const deleteStudent = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Récupère un étudiant avec toutes ses notes + les matières associées.
+ */
+export const getStudentFull = async (req, res, next) => {
+  try {
+    const studentId = req.params.id;
+
+    const result = await Student.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(studentId) }
+      },
+      {
+        $lookup: {
+          from: "notes",
+          localField: "_id",
+          foreignField: "student",
+          as: "notes"
+        }
+      },
+      {
+        $lookup: {
+          from: "matieres",
+          localField: "notes.matiere",
+          foreignField: "_id",
+          as: "matieres"
+        }
+      },
+      {
+        $addFields: {
+          notes: {
+            $map: {
+              input: "$notes",
+              as: "note",
+              in: {
+                _id: "$$note._id",
+                value: "$$note.value",
+                type: "$$note.type",
+                date: "$$note.date",
+                matiere: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: "$matieres",
+                        as: "m",
+                        cond: { $eq: ["$$m._id", "$$note.matiere"] }
+                      }
+                    },
+                    0
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          matieres: 0
+        }
+      }
+    ]);
+
+    res.status(200).json(result[0] || null);
+  } catch (error) {
+    next(error);
+  }
+};
+
