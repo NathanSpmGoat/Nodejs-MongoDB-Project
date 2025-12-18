@@ -10,7 +10,6 @@ import {
 } from "../controllers/matiereController.js";
 
 // Création d'un routeur spécifique aux matières. Un routeur permet de définir des sous‑routes
-// qui seront montées dans le fichier principal (index.js).
 const router = express.Router();
 
 // Récupérer toutes les matières

@@ -7,6 +7,7 @@
 
 import Student from "../models/studentModel.js";
 import mongoose from "mongoose";
+import Validator from "validatorjs";
 
 /**
  * Récupère la liste de tous les étudiants.
@@ -40,6 +41,18 @@ export const getStudentById = async (req, res, next) => {
  * des propriétés inattendues envoyées dans le corps de la requête.
  */
 export const createStudent = async (req, res, next) => {
+  const rules = {
+    firstname: "required|string|min:2",
+    lastname: "required|string|min:2",
+    email: "required|email",
+    grade: "required|string",
+  };
+
+  const validation = new Validator(req.body, rules);
+  if (validation.fails()) {
+    return res.status(422).json(validation.errors.all());
+  }
+
   try {
     const { firstname, lastname, email, grade } = req.body;
     const student = await Student.create({ firstname, lastname, email, grade });
@@ -53,11 +66,22 @@ export const createStudent = async (req, res, next) => {
  * Met à jour les informations d'un étudiant. Retourne 404 si l'étudiant n'existe pas.
  */
 export const updateStudent = async (req, res, next) => {
+  const rules = {
+    firstname: "required|string|min:2",
+    lastname: "required|string|min:2",
+    email: "required|email",
+    grade: "required|string",
+  };
+
+  const validation = new Validator(req.body, rules);
+  if (validation.fails()) {
+    return res.status(422).json(validation.errors.all());
+  }
+
   try {
-    const { firstname, lastname, email, grade } = req.body;
     const student = await Student.findByIdAndUpdate(
       req.params.id,
-      { firstname, lastname, email, grade },
+      req.body,
       { new: true, runValidators: true }
     );
     if (!student) {
@@ -83,6 +107,7 @@ export const deleteStudent = async (req, res, next) => {
     next(error);
   }
 };
+
 
 /**
  * Récupère un étudiant avec toutes ses notes + les matières associées.

@@ -2,8 +2,6 @@
  * Contrôleur des professeurs (Professor).
  *
  * Ce fichier regroupe les fonctions qui assurent la gestion CRUD des professeurs.
- * Chaque fonction interagit avec le modèle Mongoose pour effectuer l'opération souhaitée
- * et renvoie une réponse HTTP adaptée.
  */
 
 import Professor from "../models/professorModel.js";
@@ -36,10 +34,23 @@ export const getProfessorById = async (req, res, next) => {
   }
 };
 
+
 /**
- * Crée un nouveau professeur. Les champs du corps de la requête sont utilisés tels quels.
+ * Crée un nouveau professeur.
  */
 export const createProfessor = async (req, res, next) => {
+  const rules = {
+    firstname: "required|string|min:2",
+    lastname: "required|string|min:2",
+    email: "required|email",
+    matieres: "array",
+  };
+
+  const validation = new Validator(req.body, rules);
+  if (validation.fails()) {
+    return res.status(422).json(validation.errors.all());
+  }
+
   try {
     const prof = await Professor.create(req.body);
     res.status(201).json(prof);
@@ -49,9 +60,21 @@ export const createProfessor = async (req, res, next) => {
 };
 
 /**
- * Met à jour un professeur. Retourne 404 si le professeur n'existe pas.
+ * Met à jour un professeur.
  */
 export const updateProfessor = async (req, res, next) => {
+  const rules = {
+    firstname: "required|string|min:2",
+    lastname: "required|string|min:2",
+    email: "required|email",
+    matieres: "array",
+  };
+
+  const validation = new Validator(req.body, rules);
+  if (validation.fails()) {
+    return res.status(422).json(validation.errors.all());
+  }
+
   try {
     const prof = await Professor.findByIdAndUpdate(
       req.params.id,

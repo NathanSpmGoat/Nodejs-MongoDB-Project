@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "6936529c98ef2e3a5e11b9fe",
+    "firstname": "John",
+    "lastname": "Doe",
+    "email": "john.doe@edu.ece.fr",
+    "grade": "B1",
+    "__v": 0,
+    "createdAt": "2025-12-08T04:22:52.316Z",
+    "updatedAt": "2025-12-08T04:22:52.316Z"
+  },
+  {
+    "_id": "6936529c98ef2e3a5e11b9ff",
+    "firstname": "Jane",
+    "lastname": "Doe",
+    "email": "jane.doe@edu.ece.fr",
+    "grade": "B2",
+    "__v": 0,
+    "createdAt": "2025-12-08T04:22:52.317Z",
+    "updatedAt": "2025-12-08T04:22:52.317Z"
+  },
+  {
+    "_id": "6936529c98ef2e3a5e11ba00",
+    "firstname": "Jim",
+    "lastname": "Beam",
+    "email": "jim.beam@edu.ece.fr",
+    "grade": "Terminale",
+    "__v": 0,
+    "createdAt": "2025-12-08T04:22:52.317Z",
+    "updatedAt": "2025-12-08T04:22:52.317Z"
+  }
+]

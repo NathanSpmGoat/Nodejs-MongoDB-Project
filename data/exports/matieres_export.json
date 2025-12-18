@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "6936529c98ef2e3a5e11ba02",
+    "name": "Mathématiques",
+    "coefficient": 3,
+    "description": "Mathématiques",
+    "__v": 0,
+    "createdAt": "2025-12-08T04:22:52.331Z",
+    "updatedAt": "2025-12-08T04:22:52.331Z"
+  },
+  {
+    "_id": "6936529c98ef2e3a5e11ba03",
+    "name": "Java",
+    "coefficient": 3,
+    "description": "Java",
+    "__v": 0,
+    "createdAt": "2025-12-08T04:22:52.331Z",
+    "updatedAt": "2025-12-08T04:22:52.331Z"
+  },
+  {
+    "_id": "6936529c98ef2e3a5e11ba04",
+    "name": "Python",
+    "coefficient": 4,
+    "description": "Python",
+    "__v": 0,
+    "createdAt": "2025-12-08T04:22:52.331Z",
+    "updatedAt": "2025-12-08T04:22:52.331Z"
+  },
+  {
+    "_id": "6936529c98ef2e3a5e11ba05",
+    "name": "Node.js",
+    "coefficient": 5,
+    "description": "Node.js",
+    "__v": 0,
+    "createdAt": "2025-12-08T04:22:52.331Z",
+    "updatedAt": "2025-12-08T04:22:52.331Z"
+  }
+]

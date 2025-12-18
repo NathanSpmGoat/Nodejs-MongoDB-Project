@@ -39,9 +39,21 @@ export const getNoteById = async (req, res, next) => {
  * Crée une nouvelle note. Les champs sont extraits explicitement du corps de la requête.
  */
 export const createNote = async (req, res, next) => {
+  const rules = {
+    student: "required|string",
+    matiere: "required|string",
+    value: "required|numeric|min:0|max:20",
+    type: "required|string",
+    date: "date",
+  };
+
+  const validation = new Validator(req.body, rules);
+  if (validation.fails()) {
+    return res.status(422).json(validation.errors.all());
+  }
+
   try {
-    const { student, matiere, value, type, date } = req.body;
-    const note = await Note.create({ student, matiere, value, type, date });
+    const note = await Note.create(req.body);
     res.status(201).json(note);
   } catch (error) {
     next(error);
@@ -49,14 +61,26 @@ export const createNote = async (req, res, next) => {
 };
 
 /**
- * Met à jour une note existante. Retourne 404 si la note n'existe pas.
+ * Met à jour une note existante.
  */
 export const updateNote = async (req, res, next) => {
+  const rules = {
+    student: "required|string",
+    matiere: "required|string",
+    value: "required|numeric|min:0|max:20",
+    type: "required|string",
+    date: "date",
+  };
+
+  const validation = new Validator(req.body, rules);
+  if (validation.fails()) {
+    return res.status(422).json(validation.errors.all());
+  }
+
   try {
-    const { student, matiere, value, type, date } = req.body;
     const note = await Note.findByIdAndUpdate(
       req.params.id,
-      { student, matiere, value, type, date },
+      req.body,
       { new: true, runValidators: true }
     );
     if (!note) {
