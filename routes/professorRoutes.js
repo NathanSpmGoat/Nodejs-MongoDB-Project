@@ -5,6 +5,7 @@ import {
   createProfessor,
   updateProfessor,
   deleteProfessor,
+  getProfessorsAdvanced,
   getProfessorMatieres,
 } from "../controllers/professorController.js";
 
@@ -13,12 +14,14 @@ const router = express.Router();
 
 // Liste tous les professeurs
 router.get("/", getProfessors);
-// Récupère un professeur par son ID
-router.get("/:id", getProfessorById);
+// Lecture avancée avec filtres et pagination
+router.get("/search", getProfessorsAdvanced);
 // Récupère toutes les matières d'un professeur
 router.get("/:id/matieres", getProfessorMatieres);
 // Crée un professeur
 router.post("/", createProfessor);
+// Récupère un professeur par son ID
+router.get("/:id", getProfessorById);
 // Met à jour un professeur
 router.put("/:id", updateProfessor);
 // Supprime un professeur

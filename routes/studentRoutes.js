@@ -5,6 +5,8 @@ import {
   createStudent,
   updateStudent,
   deleteStudent,
+  getStudentsAdvanced,
+  getTopStudentsByAverage,
   getStudentFull,
 } from "../controllers/studentController.js";
 
@@ -17,16 +19,23 @@ router.get("/", getStudents);
 // Récupérer un étudiant avec toutes ses notes + matières
 router.get("/:id/full", getStudentFull);
 
-// Récupérer un étudiant par son ID
-router.get("/:id", getStudentById);
-
 // Créer un nouvel étudiant
 router.post("/", createStudent);
+
+// Supprimer un étudiant
+router.delete("/:id", deleteStudent);
+
+// Lecture avancée (filtres + pagination)
+router.get("/search", getStudentsAdvanced);
+
+// Agrégation MongoDB
+router.get("/top/averages", getTopStudentsByAverage);
+
+// Récupérer un étudiant par son ID
+router.get("/:id", getStudentById);
 
 // Mettre à jour un étudiant existant
 router.put("/:id", updateStudent);
 
-// Supprimer un étudiant
-router.delete("/:id", deleteStudent);
 
 export default router;

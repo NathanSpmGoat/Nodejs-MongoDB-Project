@@ -36,6 +36,8 @@ app.use("/notes", noteRoutes);
 app.use("/students", studentRoutes);
 app.use("/professors", professorRoutes);
 
+app.use(errorHandler);
+
 // Définition du port. On utilise une variable d'environnement si disponible
 const PORT = process.env.PORT;
 

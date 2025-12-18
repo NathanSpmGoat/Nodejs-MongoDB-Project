@@ -7,7 +7,7 @@
  */
 
 import Note from "../models/noteModel.js";
-
+import mongoose from "mongoose";
 /**
  * Récupère l'ensemble des notes.
  */
@@ -84,43 +84,115 @@ export const deleteNote = async (req, res, next) => {
 };
 
 /**
- * Calcule la moyenne des notes d'un étudiant. La moyenne est pondérée par le
- * coefficient de chaque matière afin de refléter l'importance relative des matières.
- * Si l'étudiant n'a pas de notes, la moyenne renvoyée est null.
+ * Agrégation MongoDB : moyenne pondérée d'un étudiant
+ * + affichage prénom et nom
  */
 export const getStudentAverage = async (req, res, next) => {
   try {
-    const studentId = req.params.id;
+    const studentId = new mongoose.Types.ObjectId(req.params.id);
 
-    const notes = await Note.find({ student: studentId }).populate("matiere", "coefficient");
+    const pipeline = [
+      // 1. Notes de l’étudiant
+      { $match: { student: studentId } },
 
-    if (notes.length === 0) {
-      return res.status(200).json({
-        studentId,
-        average: null,
-        count: 0,
-      });
+      // 2. Jointure avec les matières
+      {
+        $lookup: {
+          from: "matieres",
+          localField: "matiere",
+          foreignField: "_id",
+          as: "matiereDoc",
+        },
+      },
+      { $unwind: "$matiereDoc" },
+
+      // 3. Calcul pondéré
+      {
+        $addFields: {
+          weighted: {
+            $multiply: ["$value", "$matiereDoc.coefficient"],
+          },
+        },
+      },
+
+      // 4. Regroupement par étudiant
+      {
+        $group: {
+          _id: "$student",
+          totalCoeff: { $sum: "$matiereDoc.coefficient" },
+          totalWeighted: { $sum: "$weighted" },
+        },
+      },
+
+      // 5. Jointure avec l’étudiant
+      {
+        $lookup: {
+          from: "students",
+          localField: "_id",
+          foreignField: "_id",
+          as: "studentDoc",
+        },
+      },
+      { $unwind: "$studentDoc" },
+
+      // 6. Projection finale
+      {
+        $project: {
+          _id: 0,
+          firstname: "$studentDoc.firstname",
+          lastname: "$studentDoc.lastname",
+          average: {
+            $divide: ["$totalWeighted", "$totalCoeff"],
+          },
+        },
+      },
+    ];
+
+    const result = await Note.aggregate(pipeline);
+    res.status(200).json(result[0] || null);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/* Recherche avancée avec filtres, tri et pagination
+*/
+export const getNotesAdvanced = async (req, res, next) => {
+  try {
+    const { student, matiere, type, from, to, page = 1, limit = 10 } = req.query;
+
+    const filter = {};
+    if (student) filter.student = student;
+    if (matiere) filter.matiere = matiere;
+    if (type) filter.type = type;
+
+    if (from || to) {
+      filter.date = {};
+      if (from) filter.date.$gte = new Date(from);
+      if (to) filter.date.$lte = new Date(to);
     }
 
-    const { weightedSum, totalCoeff } = notes.reduce(
-      (acc, note) => {
-        const coeff = note.matiere?.coefficient || 1;
-        return {
-          weightedSum: acc.weightedSum + note.value * coeff,
-          totalCoeff: acc.totalCoeff + coeff,
-        };
-      },
-      { weightedSum: 0, totalCoeff: 0 }
-    );
+    const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+    const limitNum = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 100);
+    const skip = (pageNum - 1) * limitNum;
 
-    const average = totalCoeff > 0 ? weightedSum / totalCoeff : null;
+    const [items, total] = await Promise.all([
+      Note.find(filter).sort({ date: -1 }).skip(skip).limit(limitNum),
+      Note.countDocuments(filter),
+    ]);
 
     res.status(200).json({
-      studentId,
-      average,
-      count: notes.length,
+      page: pageNum,
+      limit: limitNum,
+      total,
+      pages: Math.ceil(total / limitNum),
+      items,
     });
   } catch (error) {
     next(error);
   }
 };
+
+
+

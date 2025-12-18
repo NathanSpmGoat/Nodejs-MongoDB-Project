@@ -152,3 +152,127 @@ export const getStudentFull = async (req, res, next) => {
   }
 };
 
+
+/**
+ * GET avancé : recherche + filtres + pagination sur les étudiants
+ */
+export const getStudentsAdvanced = async (req, res, next) => {
+  try {
+    // Récupération des paramètres de requête
+    const { grade, q, page = 1, limit = 10 } = req.query;
+
+    // Objet filtre MongoDB
+    const filter = {};
+
+    // Filtre par grade si présent
+    if (grade) filter.grade = grade;
+
+    // Recherche textuelle sur prénom, nom ou email
+    if (q) {
+      const regex = new RegExp(q, "i");
+      filter.$or = [
+        { firstname: regex },
+        { lastname: regex },
+        { email: regex }
+      ];
+    }
+
+    // Pagination sécurisée
+    const pageNum = Math.max(parseInt(page, 10), 1);
+    const limitNum = Math.min(Math.max(parseInt(limit, 10), 1), 100);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Requête MongoDB
+    const [items, total] = await Promise.all([
+      Student.find(filter)
+        .sort({ lastname: 1, firstname: 1 })
+        .skip(skip)
+        .limit(limitNum),
+      Student.countDocuments(filter),
+    ]);
+
+    res.status(200).json({
+      page: pageNum,
+      limit: limitNum,
+      total,
+      pages: Math.ceil(total / limitNum),
+      items,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Agrégation MongoDB : top étudiants par moyenne pondérée
+ */
+export const getTopStudentsByAverage = async (req, res, next) => {
+  try {
+    const limitNum = Math.min(Math.max(parseInt(req.query.limit, 10) || 5, 1), 50);
+
+    const pipeline = [
+      // Jointure avec la collection notes
+      {
+        $lookup: {
+          from: "notes",
+          localField: "_id",
+          foreignField: "student",
+          as: "notes",
+        },
+      },
+      { $unwind: "$notes" },
+
+      // Jointure avec les matières
+      {
+        $lookup: {
+          from: "matieres",
+          localField: "notes.matiere",
+          foreignField: "_id",
+          as: "matiereDoc",
+        },
+      },
+      { $unwind: "$matiereDoc" },
+
+      // Calcul note pondérée
+      {
+        $addFields: {
+          weighted: {
+            $multiply: ["$notes.value", "$matiereDoc.coefficient"]
+          }
+        }
+      },
+
+      // Regroupement par étudiant
+      {
+        $group: {
+          _id: "$_id",
+          firstname: { $first: "$firstname" },
+          lastname: { $first: "$lastname" },
+          grade: { $first: "$grade" },
+          totalCoeff: { $sum: "$matiereDoc.coefficient" },
+          totalWeighted: { $sum: "$weighted" }
+        }
+      },
+
+      // Calcul de la moyenne
+      {
+        $addFields: {
+          average: { $divide: ["$totalWeighted", "$totalCoeff"] }
+        }
+      },
+
+      // Tri décroissant par moyenne
+      { $sort: { average: -1 } },
+
+      // Limite des résultats
+      { $limit: limitNum }
+    ];
+
+    const result = await Student.aggregate(pipeline);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+

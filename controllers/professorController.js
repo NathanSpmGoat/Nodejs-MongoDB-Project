@@ -108,3 +108,42 @@ export const getProfessorMatieres = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Lecture avancée : recherche + pagination des professeurs
+ */
+export const getProfessorsAdvanced = async (req, res, next) => {
+  try {
+    const { q, matiere, page = 1, limit = 10 } = req.query;
+
+    const filter = {};
+
+    if (q) {
+      const regex = new RegExp(q, "i");
+      filter.$or = [
+        { firstname: regex },
+        { lastname: regex },
+        { email: regex }
+      ];
+    }
+
+    if (matiere) filter.matieres = matiere;
+
+    const pageNum = Math.max(parseInt(page, 10), 1);
+    const limitNum = Math.min(Math.max(parseInt(limit, 10), 1), 100);
+    const skip = (pageNum - 1) * limitNum;
+
+    const [items, total] = await Promise.all([
+      Professor.find(filter).skip(skip).limit(limitNum),
+      Professor.countDocuments(filter)
+    ]);
+
+    res.status(200).json({
+      page: pageNum,
+      total,
+      items
+    });
+  } catch (error) {
+    next(error);
+  }
+};
